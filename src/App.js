@@ -33,27 +33,28 @@ function App() {
 
   useEffect(() => {
     const fetchUsername = async () => {
-     // const user = supabase.auth.getSession();
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      const { user } = session
-
-
-      if (user) {
-        // Query the profiles table to get the username
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('user_id', session.user.id)  // Assuming 'id' is the column that relates to the user's ID
-          .single();
-
-        if (error) {
-          console.error('Error fetching profile:', error);
-        } else {
-          setUsername(data.username);
+      const session = supabase.auth.getSession();
+    
+      if (session) {
+        const { user } = session;
+    
+        if (user) {
+          // Query the profiles table to get the username
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', user.id)
+            .single();
+    
+          if (error) {
+            console.error('Error fetching profile:', error);
+          } else {
+            setUsername(data.username);
+          }
         }
+      } else {
+        // Handle the case where there is no session (user is not logged in)
+        setUsername(null);
       }
     };
 
@@ -72,6 +73,11 @@ function App() {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUsername(null); // Reset the username state
+  };
  
 
 
@@ -92,8 +98,9 @@ function App() {
         </div>
 
         {username && (
-        <div className="welcome-message">
-          Welcome, {username}
+        <div style={{ position: 'absolute', top: 0, right: 0 }}>
+          <span>Welcome, {username}</span>
+          <button onClick={handleSignOut} style={{ marginLeft: '10px' }}>Sign Out</button>
         </div>
       )}
       </div>

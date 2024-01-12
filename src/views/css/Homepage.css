@@ -1,0 +1,23 @@
+/* Homepage.css */
+.event-box {
+    border: 1px solid #ddd; /* Light grey border */
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+  }
+  
+  .event-title {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  
+  .event-description {
+    margin-bottom: 10px;
+  }
+  
+  .event-details {
+    color: #666; /* Lighter text color for less important details */
+    font-size: 0.9em;
+  }
+  

@@ -48,11 +48,12 @@ function Signup() {
 
   return (
     <Flex width="100vw" height="100vh" justifyContent="center" alignItems="center">
-      <VStack spacing={4}>
-        <Heading>Sign Up</Heading>
-          <FormControl id="email">
+      <VStack spacing={4} className="custom-form">
+        <Heading className="custom-heading">Sign Up</Heading>
+          <FormControl id="email" className="custom-form-control">
             <FormLabel>Email address</FormLabel>
             <Input
+              className="custom-input"
               type="email"
               placeholder="Enter your email"
               value={email}
@@ -62,6 +63,7 @@ function Signup() {
           <FormControl id="password">
             <FormLabel>Password</FormLabel>
             <Input
+              className="custom-input"
               type="password"
               placeholder="Enter your password"
               value={password}

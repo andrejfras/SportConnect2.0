@@ -7,6 +7,7 @@ function CreateEvent() {
   const [date, setDate] = useState('');
   const [message, setMessage] = useState('');
   const [creator, setCreatorEmail] = useState('');
+  const user = supabase.auth.getUser();
 
 
 
@@ -38,6 +39,10 @@ function CreateEvent() {
     setDescription('');
     setDate('');
   };
+
+  if (!user) {
+    return <p>You must be signed in to create events.</p>; // Or redirect to login page
+  }
 
   return (
     <form onSubmit={handleSubmit}>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import supabase from '../services/supabaseClient';
+import './css/Homepage.css';
 
 function Homepage() {
   const [events, setEvents] = useState([]);
@@ -20,11 +21,11 @@ function Homepage() {
   return (
     <div>
       {events.map(event => (
-        <div key={event.id}>
-          <h3>{event.title}</h3>
-          <p>{event.description}</p>
-          <p>{event.date}</p>
-          <p>Created by: {event.creator}</p>
+        <div key={event.id} className="event-box">
+          <h3 className="event-title">{event.title}</h3>
+          <p className="event-description">{event.description}</p>
+          <p className="event-details">{event.date}</p>
+          <p className="event-details">Created by: {event.creator}</p>
           {/* More event details */}
         </div>
       ))}
