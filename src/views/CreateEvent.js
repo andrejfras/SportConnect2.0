@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import supabase from '../services/supabaseClient'; // Import your Supabase client
 
 function CreateEvent() {
@@ -6,27 +6,24 @@ function CreateEvent() {
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   const [message, setMessage] = useState('');
-  const [creator, setCreatorEmail] = useState('');
-  const user = supabase.auth.getUser();
-
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      const { user } = session
+    // Retrieve the current user's session to get their email
+    const session = supabase.auth.getSession();
 
-    setCreatorEmail(session.user.email)
-      
+    if (!session) {
+      setMessage("You must be signed in to create events.");
+      return;
+    }
+
+    const creatorEmail = (await session).data.session.user.email;
 
     // Assuming you have a table named 'events' in your Supabase database
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('events')
-      .insert([{ title, description, date, creator}]);
+      .insert([{ title, description, date, creator: creatorEmail }]);
 
     if (error) {
       setMessage(error.message);
@@ -39,10 +36,14 @@ function CreateEvent() {
     setDescription('');
     setDate('');
   };
-
+/*
+  // Check if the user is signed in before displaying the form
+  const user = supabase.auth.getUser();
   if (!user) {
     return <p>You must be signed in to create events.</p>; // Or redirect to login page
   }
+
+  */
 
   return (
     <form onSubmit={handleSubmit}>
