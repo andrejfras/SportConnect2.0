@@ -5,9 +5,16 @@ import MiniMapComponent from './MiniMapComponent';
 
 function Homepage() {
   const [events, setEvents] = useState([]);
+  const [sports, setSports] = useState({});
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchSportsAndEvents = async () => {
+      const { data: sportsData } = await supabase.from('sports').select('*');
+      const sportsMap = {};
+      sportsData.forEach(sport => {
+        sportsMap[sport.id] = sport.name;
+      });
+      setSports(sportsMap);
       const { data, error } = await supabase.from('events').select('*');
       if (error) {
         console.error('Error fetching events:', error);
@@ -17,16 +24,29 @@ function Homepage() {
       }
     };
 
-    fetchEvents();
+    fetchSportsAndEvents();
   }, []);
+
+  function formatDateTime(dateTimeStr) {
+    const options = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    };
+  
+    return new Date(dateTimeStr).toLocaleString('en-US', options);
+  }
 
   return (
     <div>
       {events.map(event => (
         <div key={event.id} className="event-box">
           <h3 className="event-title">{event.title}</h3>
+          <p>Sport: {sports[event.sport_id]}</p>
           <p className="event-description">{event.description}</p>
-          <p className="event-details">{event.date}</p>
+          <p>Date and Time: {formatDateTime(event.date)}</p>
           <p className="event-details">Created by: {event.creator}</p>
           {event.location && (
             <div>

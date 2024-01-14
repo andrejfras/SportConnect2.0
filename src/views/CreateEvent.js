@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import supabase from '../services/supabaseClient';
 import MapComponent from './MapComponent'; 
+
 
 function CreateEvent() {
   const [title, setTitle] = useState('');
@@ -9,6 +10,9 @@ function CreateEvent() {
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
   const [address, setAddress] = useState('');
   const [message, setMessage] = useState('');
+  const [sports, setSports] = useState([]);
+  const [selectedSport, setSelectedSport] = useState('');
+  const [time, setTime] = useState('');
 
   const handleMapClick = async (latLng) => {
     // Updated to access lat and lng as properties
@@ -41,7 +45,25 @@ function CreateEvent() {
       return '';
     }
   };
+
   
+  useEffect(() => {
+    const fetchSports = async () => {
+      console.log('Fetching sports...');  // Initial log
+      const { data, error } = await supabase.from('sports').select('*');
+      if (error) {
+        console.error('Error fetching sports:', error);
+      } else if (data) {
+        console.log('Fetched sports:', data);  // Log fetched data
+        setSports(data);
+      } else {
+        console.log('No data received');
+      }
+    };
+  
+    fetchSports();
+  }, []);
+
   
   
 
@@ -53,6 +75,8 @@ function CreateEvent() {
       return;
     }
 
+    const dateTime = `${date}T${time}`;
+
     // Validation for coordinates
     if (coordinates.lat === null || coordinates.lng === null) {
       setMessage('Please select a location on the map.');
@@ -61,7 +85,7 @@ function CreateEvent() {
 
     const { error } = await supabase
       .from('events')
-      .insert([{ title, description, date, location: [coordinates.lat, coordinates.lng], creator: (await session).data.session.user.email, address }]);
+      .insert([{ title, description, date: dateTime, location: [coordinates.lat, coordinates.lng], creator: (await session).data.session.user.email, address, sport_id: selectedSport, }]);
     
     if (error) {
       setMessage(error.message);
@@ -73,6 +97,7 @@ function CreateEvent() {
       setDate('');
       setCoordinates({ lat: null, lng: null });
       setAddress('');
+      setSelectedSport('')
     }
   };
 
@@ -94,8 +119,30 @@ function CreateEvent() {
         value={date}
         onChange={(e) => setDate(e.target.value)}
       />
+      <label htmlFor="time">Time:</label>
+        <input
+          type="time"
+          id="time"
+          value={time}
+          onChange={(e) => setTime(e.target
+      .value)}
+      />
+
+      <label htmlFor="sport">Choose a sport:</label>
+      <select
+        id="sport"
+        value={selectedSport}
+        onChange={(e) => setSelectedSport(e.target.value)}
+      >
+        <option value="">Select a sport</option> 
+        {sports.map(sport => (
+          <option key={sport.id} value={sport.id}>{sport.name}</option>
+        ))}
+      </select>
       <MapComponent onLocationChange={handleMapClick} />
       {message && <p>{message}</p>}
+
+      
       <button type="submit">Create Event</button>
     </form>
   );

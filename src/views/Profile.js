@@ -4,7 +4,7 @@ import supabase from '../services/supabaseClient';
 function Profile() {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
-  const [age, setAge] = useState(''); // New state for age
+  const [birthdate, setBirthdate] = useState('');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -28,7 +28,7 @@ function Profile() {
 
         if (profile) {
           setUsername(profile.username);
-          setAge(profile.age); // Set the age from the profile
+          setBirthdate(profile.age); // Set the age from the profile
         }
       }
 
@@ -44,8 +44,8 @@ function Profile() {
 
     const { error } = await supabase
       .from('profiles')
-      .update({ username, age }) // Include age in the update
-      .eq('user_id', supabase.auth.getUser().id);
+      .update({ username, age: birthdate }) // Include age in the update
+      .eq('user_id', (await supabase.auth.getUser()).data.user.id);
 
     if (error) {
       setMessage(error.message);
@@ -74,11 +74,12 @@ function Profile() {
           />
         </div>
         <div>
-          <label>Age:</label>
+        <label htmlFor="birthdate">Date of Birth:</label>
           <input
-            type="number"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
+            type="date"
+            id="birthdate"
+            value={birthdate}
+            onChange={(e) => setBirthdate(e.target.value)}
           />
         </div>
         <button type="submit">Update Profile</button>
