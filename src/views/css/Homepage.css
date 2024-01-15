@@ -3,9 +3,27 @@
     border: 1px solid #ddd; /* Light grey border */
     border-radius: 8px;
     padding: 20px;
-    margin-bottom: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px; /* Adjust as needed */
+    text-align: left;
   }
+
+
+.event-info {
+  margin-left: 20px; /* Adjust as needed for spacing */
+  width: 50%;
+}
+
+.map {
+  width:50%;
+  height:100%;
+}
+
+.attbutton{
+  width: 100px;
+}
   
   .event-title {
     font-size: 1.2em;

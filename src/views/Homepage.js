@@ -150,23 +150,27 @@ function isAttending(event, username) {
     <div>
       {events.map(event => (
         <div key={event.id} className="event-box">
-          <h3 className="event-title">{event.title}</h3>
-          <p>Sport: {sports[event.sport_id]}</p>
-          <p className="event-description">{event.description}</p>
-          <p>Date and Time: {formatDateTime(event.date)}</p>
-          <p className="event-details">Created by: {event.creator}</p>
-          {event.location && (
-            <div>
-              <p>Location: Latitude: {event.location[0]}, Longitude: {event.location[1]}</p>
-              <p>Address: {event.address}</p>
-              <MiniMapComponent coordinates={event.location} />
-            </div>
-          )}
+          <div className = "event-info">
+            <h2 className="event-title">{event.title}</h2>
+            <h4>Sport: {sports[event.sport_id]}</h4>
+            <p className="event-description">{event.description}</p>
+            <p>Date and Time: {formatDateTime(event.date)}</p>
+            <p className="event-details">Created by: {event.creator}</p>
+            <p>Address: {event.address}</p>
             {event.event_attendees.includes(userId) ? (
-            <button onClick={() => unattendEvent(event.id)}>Unattend Event</button>
-          ) : (
-            <button onClick={() => attendEvent(event.id)}>Attend Event</button>
-          )}
+                <button className="attbutton" onClick={() => unattendEvent(event.id)}>Unattend Event</button>
+              ) : (
+                <button className="attbutton" onClick={() => attendEvent(event.id)}>Attend Event</button>
+            )}
+          </div>
+          <div className="map">
+            {event.location && (
+              <div>
+                
+                <MiniMapComponent coordinates={event.location} />
+              </div>
+            )}
+          </div>
           {/* More event details */}
         </div>
       ))}

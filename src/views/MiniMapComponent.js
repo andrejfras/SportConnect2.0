@@ -14,7 +14,7 @@ const MiniMapComponent = ({ coordinates }) => {
     <MapContainer 
       center={position} 
       zoom={17} 
-      style={{ height: '200px', width: '50%'}}
+      style={{ height: '300px', width: '100%'}}
       scrollWheelZoom={false} // Disable scroll wheel zoom
       dragging={false} // Disable dragging
       touchZoom={false} // Disable touch zoom

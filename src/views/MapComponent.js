@@ -41,7 +41,7 @@ const MapComponent = ({ onLocationChange }) => {
   };
 
   return (
-    <MapContainer center={{ lat: 45.5475390323761, lng: 13.7295627593994 }} zoom={14} style={{ height: '500px', width: '500px' }} className="map-container">
+    <MapContainer center={{ lat: 45.5475390323761, lng: 13.7295627593994 }} zoom={14} style={{ height: '500px', width: '100%' }} className="map-container">
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

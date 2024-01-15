@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import supabase from '../services/supabaseClient';
 import MapComponent from './MapComponent'; 
+import './css/CreateEvent.css';
 
 
 function CreateEvent() {
@@ -133,48 +134,60 @@ function CreateEvent() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+  
+      <form onSubmit={handleSubmit} className="create-event-form">
       <input
         type="text"
         placeholder="Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        className="form-input"
       />
       <textarea
         placeholder="Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
+        className="form-textarea"
       />
+
+     
+      <label htmlFor="date" className="form-label">Date:</label>
       <input
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
+        className="form-input"
       />
-      <label htmlFor="time">Time:</label>
+       
+    
+      <label htmlFor="time" className="form-label">Time:</label>
         <input
           type="time"
           id="time"
           value={time}
-          onChange={(e) => setTime(e.target
-      .value)}
+          onChange={(e) => setTime(e.target.value)}
+          className="form-input"
       />
 
-      <label htmlFor="sport">Choose a sport:</label>
-      <select
-        id="sport"
-        value={selectedSport}
-        onChange={(e) => setSelectedSport(e.target.value)}
-      >
+      <label htmlFor="sport" className="form-label">Choose a sport:</label>
+        <select
+          id="sport"
+          value={selectedSport}
+          onChange={(e) => setSelectedSport(e.target.value)}
+          className="form-select"
+        >
         <option value="">Select a sport</option> 
-        {sports.map(sport => (
-          <option key={sport.id} value={sport.id}>{sport.name}</option>
-        ))}
+          {sports.map(sport => (
+            <option key={sport.id} value={sport.id}>{sport.name}</option>
+          ))}
       </select>
+      <label htmlFor="sport" className="form-label">Select event location:</label>
       <MapComponent onLocationChange={handleMapClick} />
       {message && <p>{message}</p>}
 
       
       <button type="submit">Create Event</button>
+
     </form>
   );
 }

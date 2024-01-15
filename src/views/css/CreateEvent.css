@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Salsa&display=swap');
+
+.create-event-container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Salsa', cursive;
+}
+
+.create-event-form {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 15px;
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.exo-2 {
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.create-event-form label {
+    font-weight: bold;
+}
+
+.create-event-form input[type="text"],
+.create-event-form textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.create-event-form textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.submit-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 15px;
+    height:40px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+
