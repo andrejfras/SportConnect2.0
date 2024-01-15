@@ -48,11 +48,40 @@ function App() {
       if (session) {
         // Assuming the user's email is used as the username
         // Replace 'email' with the appropriate field if different
-        setUsername(session.data.user.email);
+     //   setUsername(session.data.user.email);
       }
     };
 
     checkSession();
+
+    const fetchProfile = async () => {
+      const user = supabase.auth.getUser();
+      console.log("User object:", supabase.auth.getUser());
+        console.log("User ID:", supabase.auth.getUser());
+
+      if (user) {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', (await user).data.user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching profile:', error);
+       //   setLoading(false);
+          return;
+        }
+
+        if (profile) {
+          setUsername(profile.username);
+          
+        }
+      }
+
+    //  setLoading(false);
+    };
+
+    fetchProfile();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN') {
@@ -103,7 +132,7 @@ function App() {
           <span>Welcome, {username}</span>
           <button onClick={handleLogout} style={{ marginLeft: '10px' }}>Sign Out</button>
         </div>
-      )}
+        )}
       </div>
     </Router>
   );

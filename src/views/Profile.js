@@ -4,6 +4,8 @@ import supabase from '../services/supabaseClient';
 function Profile() {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
   const [birthdate, setBirthdate] = useState('');
   const [message, setMessage] = useState('');
 
@@ -28,7 +30,9 @@ function Profile() {
 
         if (profile) {
           setUsername(profile.username);
-          setBirthdate(profile.age); // Set the age from the profile
+          setBirthdate(profile.age);
+          setName(profile.name)
+          setSurname(profile.surname) // Set the age from the profile
         }
       }
 
@@ -44,7 +48,7 @@ function Profile() {
 
     const { error } = await supabase
       .from('profiles')
-      .update({ username, age: birthdate }) // Include age in the update
+      .update({ username, name, surname, age: birthdate}) // Include age in the update
       .eq('user_id', (await supabase.auth.getUser()).data.user.id);
 
     if (error) {
@@ -74,12 +78,28 @@ function Profile() {
           />
         </div>
         <div>
-        <label htmlFor="birthdate">Date of Birth:</label>
+          <label htmlFor="birthdate">Date of Birth:</label>
+            <input
+              type="date"
+              id="birthdate"
+              value={birthdate}
+              onChange={(e) => setBirthdate(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Name:</label>
           <input
-            type="date"
-            id="birthdate"
-            value={birthdate}
-            onChange={(e) => setBirthdate(e.target.value)}
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Surname:</label>
+          <input
+            type="text"
+            value={surname}
+            onChange={(e) => setSurname(e.target.value)}
           />
         </div>
         <button type="submit">Update Profile</button>

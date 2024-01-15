@@ -7,6 +7,7 @@ function CreateEvent() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
+  const [creator, setCreator] = useState('');
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
   const [address, setAddress] = useState('');
   const [message, setMessage] = useState('');
@@ -47,6 +48,7 @@ function CreateEvent() {
   };
 
   
+  
   useEffect(() => {
     const fetchSports = async () => {
       console.log('Fetching sports...');  // Initial log
@@ -62,6 +64,35 @@ function CreateEvent() {
     };
   
     fetchSports();
+  
+    const fetchProfile = async () => {
+      const user = supabase.auth.getUser();
+      console.log("User object:", supabase.auth.getUser());
+        console.log("User ID:", supabase.auth.getUser());
+
+      if (user) {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', (await user).data.user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching profile:', error);
+       //   setLoading(false);
+          return;
+        }
+
+        if (profile) {
+          setCreator(profile.username);
+          
+        }
+      }
+
+    //  setLoading(false);
+    };
+
+    fetchProfile();
   }, []);
 
   
@@ -85,7 +116,7 @@ function CreateEvent() {
 
     const { error } = await supabase
       .from('events')
-      .insert([{ title, description, date: dateTime, location: [coordinates.lat, coordinates.lng], creator: (await session).data.session.user.email, address, sport_id: selectedSport, }]);
+      .insert([{ title, description, date: dateTime, location: [coordinates.lat, coordinates.lng], creator: creator, address, sport_id: selectedSport, event_attendees: [(await supabase.auth.getUser()).data.user.id]}]);
     
     if (error) {
       setMessage(error.message);
