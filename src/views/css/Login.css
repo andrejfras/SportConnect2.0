@@ -1,13 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Salsa&display=swap');
+
+
 /* Login.css */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 50vh;
+  }
+
+  .h1, h2, h3{
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
   }
   
   .login-form {
-    width: 300px;
+    width: 400px;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -26,5 +36,38 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
   }
+
+  .logininput{
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding for better touch */
+    margin: 5px 0; /* Margin between elements */
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+ .loginbutton {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding for better touch */
+    margin: 5px 0; /* Margin between elements */
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+ }
+
+  .heading{
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    text-align: left;
+  }
+  
   

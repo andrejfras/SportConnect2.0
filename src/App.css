@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Salsa&display=swap');
+
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -44,35 +47,55 @@
 
 /* App.css */
 .navbar {
-  padding: 10px;
-  background-color: #333;
-  color: white;
+  background-color: #000000; /* Dark background */
+  height: 50px; /* Fixed height */
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Space between the two main sections */
+  padding: 0 10px;
+  align-items: center;
+  font-family: "Exo 2", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.navbar-section {
+  display: flex;
   align-items: center;
 }
 
 .navbar ul {
   list-style-type: none;
-  display: flex;
-  justify-content: space-around;
   margin: 0;
   padding: 0;
+  display: flex;
 }
 
 .navbar li {
-  padding: 8px;
+  margin: 10px 5px;
 }
 
-.navbar a {
+.navbar a, .navbar button {
   color: white;
   text-decoration: none;
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
+.navbar a:hover, .navbar button:hover {
+  background-color: #6e6e6e; /* Slight change on hover */
+  border-radius: 5px;
+}
+
+
 .welcome-message {
+  text-align: right;
   margin-right: 10px;
-  color: green;
-  font-size: 20px;
+  color: rgb(255, 255, 255);
+  font-size: 14px;
+  align-items: right;
 }
 
 .content-container {

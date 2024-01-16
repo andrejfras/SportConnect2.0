@@ -32,7 +32,7 @@ function Homepage() {
       console.log("User object:", supabase.auth.getUser());
         console.log("User ID:", supabase.auth.getUser());
 
-      if (user) {
+      if (user && user.user && user.user.id) {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
@@ -155,8 +155,8 @@ function isAttending(event, username) {
             <h4>Sport: {sports[event.sport_id]}</h4>
             <p className="event-description">{event.description}</p>
             <p>Date and Time: {formatDateTime(event.date)}</p>
-            <p className="event-details">Created by: {event.creator}</p>
             <p>Address: {event.address}</p>
+            <p className="event-details">Created by: {event.creator}</p>
             {event.event_attendees.includes(userId) ? (
                 <button className="attbutton" onClick={() => unattendEvent(event.id)}>Unattend Event</button>
               ) : (

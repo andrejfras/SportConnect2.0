@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, FormControl, FormLabel, Input, VStack, Flex, Heading } from '@chakra-ui/react';
 import { signUp } from '../services/supabaseAuthService';
 import supabase from '../services/supabaseClient';
-import './css/Signup.css';
+import './css/Login.css';
 
 function Signup() {
   const [email, setEmail] = useState('');
@@ -47,32 +47,27 @@ function Signup() {
   };
 
   return (
-    <Flex width="100vw" height="100vh" justifyContent="center" alignItems="center">
-      <VStack spacing={4} className="custom-form">
-        <Heading className="custom-heading">Sign Up</Heading>
-          <FormControl id="email" className="custom-form-control">
-            <FormLabel>Email address</FormLabel>
-            <Input
-              className="custom-input"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+    <Flex
+    height="50vh" // Full viewport height
+    alignItems="center" // Vertically aligns children in the center
+    justifyContent="center"
+    textAlign='left' // Horizontally aligns children in the center
+    >
+      <Box p={5} shadow="md" borderWidth="1px" borderRadius="md">
+        <VStack spacing={4}>
+        <Heading className="heading">Register</Heading>
+          <FormControl id="email" className="login-input">
+            <FormLabel className="heading">Email address</FormLabel>
+            <Input className="login-input" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
           </FormControl>
-          <FormControl id="password">
-            <FormLabel>Password</FormLabel>
-            <Input
-              className="custom-input"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <FormControl id="password" className="login-input">
+            <FormLabel className="heading">Password</FormLabel>
+            <Input className="login-input" value={password} onChange={e => setPassword(e.target.value)} placeholder="Choose a password" type="password" />
           </FormControl>
         {error && <Box color="red.500">{error}</Box>}
-        <Button colorScheme="blue" onClick={handleSignup}>Sign Up</Button>
+        <Button onClick={handleSignup}>Sign Up</Button>
       </VStack>
+      </Box>
     </Flex>
   );
 }

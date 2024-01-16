@@ -2,6 +2,17 @@ import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import './css/MapComponent.css';
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const MapComponent = ({ onLocationChange }) => {
   const [position, setPosition] = useState(null);
@@ -35,10 +46,13 @@ const MapComponent = ({ onLocationChange }) => {
       },
     });
 
+    
+
     return position === null ? null : (
       <Marker position={position}></Marker>
     );
   };
+
 
   return (
     <MapContainer center={{ lat: 45.5475390323761, lng: 13.7295627593994 }} zoom={14} style={{ height: '500px', width: '100%' }} className="map-container">

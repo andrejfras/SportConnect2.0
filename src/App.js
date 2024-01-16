@@ -10,19 +10,17 @@ import './App.css';
 
 
 function Navbar({ username, onLogout }) {
-  const handlePrintUser = () => {
-    console.log(`Current user: ${username}`);
-  };
 
   return (
     <nav className="navbar">
       <ul style={{ listStyleType: 'none', display: 'flex', justifyContent: 'space-around' }}>
-        <li><Link to="/">Home</Link></li>
         {username ? (
           <>
+            <li><Link to="/">Home</Link></li>
             <li><Link to="/create-event">Create Event</Link></li>
             <li><Link to="/profile">My Profile</Link></li>
-            <li><button onClick={handlePrintUser}>Print User</button></li>
+            <li>{username && <div className='welcome-message'>Welcome, {username}</div>}</li>
+            <button onClick={onLogout} style={{ marginLeft: '10px' }}>Sign Out</button>
           </>
         ) : (
           <>
@@ -55,30 +53,25 @@ function App() {
     checkSession();
 
     const fetchProfile = async () => {
-      const user = supabase.auth.getUser();
-      console.log("User object:", supabase.auth.getUser());
-        console.log("User ID:", supabase.auth.getUser());
-
-      if (user) {
+      const userResponse = await supabase.auth.getUser();
+      const user = userResponse.data;
+    
+      if (user && user.user && user.user.id) {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('user_id', (await user).data.user.id)
+          .eq('user_id', user.user.id)
           .single();
-
+    
         if (error) {
           console.error('Error fetching profile:', error);
-       //   setLoading(false);
           return;
         }
-
+    
         if (profile) {
           setUsername(profile.username);
-          
         }
       }
-
-    //  setLoading(false);
     };
 
     fetchProfile();
@@ -107,7 +100,6 @@ function App() {
     await supabase.auth.signOut();
     setUsername(null);
   };
- 
 
 
 
@@ -115,7 +107,7 @@ function App() {
   return (
     <Router>
       <div>
-      <Navbar username={username} />
+      <Navbar username={username}  onLogout={handleLogout}/>
         <div className="content-container">
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -126,13 +118,6 @@ function App() {
           {/* Add other routes as needed */}
         </Routes>
         </div>
-
-        {username && (
-        <div style={{ position: 'absolute', top: 0, right: 0 }}>
-          <span>Welcome, {username}</span>
-          <button onClick={handleLogout} style={{ marginLeft: '10px' }}>Sign Out</button>
-        </div>
-        )}
       </div>
     </Router>
   );

@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Salsa&display=swap');
+
+
 /* Homepage.css */
 .event-box {
     border: 1px solid #ddd; /* Light grey border */
@@ -8,12 +11,18 @@
     justify-content: space-between;
     margin-bottom: 20px; /* Adjust as needed */
     text-align: left;
+
+   
   }
 
 
 .event-info {
   margin-left: 20px; /* Adjust as needed for spacing */
   width: 50%;
+  font-family: "Exo 2", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
 
 .map {
@@ -38,4 +47,12 @@
     color: #666; /* Lighter text color for less important details */
     font-size: 0.9em;
   }
+
+  .exo-2 {
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
   
+

@@ -27,12 +27,19 @@ function Login() {
   };
 
   return (
-    <Flex width="100vw" height="100vh" justifyContent="center" alignItems="center">
+    <Flex
+    height="50vh" // Full viewport height
+    alignItems="center" // Vertically aligns children in the center
+    justifyContent="center"
+    textAlign='left' // Horizontally aligns children in the center
+    >
+    <Box p={5} shadow="md" borderWidth="1px" borderRadius="md">
       <VStack spacing={4}>
-          <Heading>Login</Heading>
+          <Heading className="heading">Login</Heading>
           <FormControl id="email">
-            <FormLabel>Email address</FormLabel>
+            <FormLabel className="heading">Email address</FormLabel>
             <Input
+              className='logininput'
               type="email"
               placeholder="Enter your email"
               value={email}
@@ -40,8 +47,9 @@ function Login() {
             />
           </FormControl>
           <FormControl id="password">
-            <FormLabel>Password</FormLabel>
-            <Input
+            <FormLabel className="heading">Password</FormLabel>
+            <Input 
+              className='logininput'
               type="password"
               placeholder="Enter your password"
               value={password}
@@ -49,8 +57,9 @@ function Login() {
             />
           </FormControl>
           {error && <Box color="red.500">{error}</Box>}
-          <Button colorScheme="blue" onClick={handleLogin}>Login</Button>
+          <Button colorScheme="blue" className='loginbutton' onClick={handleLogin}>Login</Button>
         </VStack>
+      </Box>
     </Flex>
   );
 }
