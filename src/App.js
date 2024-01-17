@@ -6,6 +6,7 @@ import Signup from './views/Signup.js';
 import Homepage from './views/Homepage.js'; 
 import CreateEvent from './views/CreateEvent.js';
 import Profile from './views/Profile.js';
+import UserCreatedEvents from './views/UserCreatedEvents.js';
 import './App.css';
 
 
@@ -18,7 +19,8 @@ function Navbar({ username, onLogout }) {
           <>
             <li><Link to="/">Home</Link></li>
             <li><Link to="/create-event">Create Event</Link></li>
-            <li><Link to="/profile">My Profile</Link></li>
+            <li><Link to="/profile">Profile</Link></li>
+            <li><Link to="/user-events">My Events</Link></li>
             <li>{username && <div className='welcome-message'>Welcome, {username}</div>}</li>
             <button onClick={onLogout} style={{ marginLeft: '10px' }}>Sign Out</button>
           </>
@@ -114,6 +116,7 @@ function App() {
           <Route path="/register" element={<Signup />} />
           <Route path="/" element={<Homepage />} />
           <Route path="/create-event" element={<CreateEvent username={username} />} />
+          <Route path="/user-events" element={<UserCreatedEvents username={username} />} />
           <Route path="/profile" element={<Profile />} /> {/* New route for creating events */}
           {/* Add other routes as needed */}
         </Routes>
