@@ -7,6 +7,7 @@ function Homepage() {
   const [events, setEvents] = useState([]);
   const [sports, setSports] = useState({});
   const [userId, setUserId] = useState('');
+  const [averageRating, setAverageRating] = useState(0);
 
   const getMaxUsersForEvent = useCallback(async (eventId) => {
     const event = await getEventById(eventId);
@@ -14,159 +15,201 @@ function Homepage() {
     return sport.playerNum;
   }, []);
 
-useEffect(() => {
-    const fetchSportsAndEvents = async () => {
-      const { data: sportsData } = await supabase.from('sports').select('*');
-      const sportsMap = {};
-      sportsData.forEach(sport => {
-        sportsMap[sport.id] = sport.name;
-      });
-      setSports(sportsMap);
-      const { data, error } = await supabase.from('events').select('*');
-      if (error) {
-        console.error('Error fetching events:', error);
-      } else {
-        const sortedData = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-        setEvents(sortedData);
-      }
-
-      const updatedEvents = await Promise.all(data.map(async (event) => {
-        const maxUsers = await getMaxUsersForEvent(event.id);
-        return { ...event, maxUsers };
-      }));
-    
-      setEvents(updatedEvents);
-    };
-
-    fetchSportsAndEvents();
-
-    const checkSession = async () => {
-      const session = supabase.auth.getSession();
-
-      if (session) {
-        setUserId((await session).data.session.user.id)
-      }
-    };
-
-    checkSession();
-
-},[getMaxUsersForEvent]);
-
-function formatDateTime(dateTimeStr) {
-    const options = { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric', 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    };
-  
-    return new Date(dateTimeStr).toLocaleString('en-US', options);
-}
-
-async function attendEvent(eventId) {
-    const id = (await supabase.auth.getUser()).data.user.id;
-    // Step 1: Retrieve the current attendees array for the event
-    const { data: eventData, error: retrieveError } = await supabase
-        .from('events')
-        .select('event_attendees')
-        .eq('id', eventId)
-        .single();
-
-    if (retrieveError) {
-        console.error('Error retrieving event data:', retrieveError);
-        return false;
-    }
-
-    // Check if the user is already attending the event
-    if (eventData.event_attendees && eventData.event_attendees.includes(id)) {
-        console.log('User is already attending the event');
-        return false;
-    }
-
-    // Step 2: Append the new username to the attendees array
-    const updatedAttendees = eventData.event_attendees ? [...eventData.event_attendees, id] : [id];
-
-    // Step 3: Update the event with the new attendees array
-    const { error: updateError } = await supabase
-        .from('events')
-        .update({ event_attendees: updatedAttendees })
-        .eq('id', eventId);
-
-    if (updateError) {
-        console.error('Error updating event attendees:', updateError);
-        return false;
-    }
-
-    console.log('Attendee added successfully');
-    if (!updateError) {
-      console.log('Attendee removed successfully');
-      
-      // Update the events state
-      setEvents(prevEvents => prevEvents.map(event => {
-        if (event.id === eventId) {
-          return {
-            ...event,
-            event_attendees: updatedAttendees
-          };
+  useEffect(() => {
+      const fetchSportsAndEvents = async () => {
+        const { data: sportsData } = await supabase.from('sports').select('*');
+        const sportsMap = {};
+        sportsData.forEach(sport => {
+          sportsMap[sport.id] = sport.name;
+        });
+        setSports(sportsMap);
+        const { data, error } = await supabase.from('events').select('*');
+        if (error) {
+          console.error('Error fetching events:', error);
+        } else {
+          const sortedData = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          setEvents(sortedData);
         }
-        return event;
-      }));
-    }
-  
-    return !updateError;
-}
 
-async function getEventById(eventId) {
-  try {
-      const { data, error } = await supabase
+        const updatedEvents = await Promise.all(data.map(async (event) => {
+          const maxUsers = await getMaxUsersForEvent(event.id);
+          return { ...event, maxUsers };
+        }));
+
+        const updatedEventsWithRatings = await Promise.all(updatedEvents.map(async (event) => {
+          const { data: ratingsData } = await supabase
+              .from('user_ratings')
+              .select('rating')
+              .eq('ratee_id', event.creator); // Assuming 'creator' holds the user ID of the creator
+
+          let avgRating = 0;
+          if (ratingsData && ratingsData.length > 0) {
+              const total = ratingsData.reduce((acc, { rating }) => acc + rating, 0);
+              avgRating = total / ratingsData.length;
+          }
+
+          return { ...event, creatorAvgRating: avgRating };
+      }));
+
+      setEvents(updatedEventsWithRatings);
+  };
+
+      fetchSportsAndEvents();
+
+      const checkSession = async () => {
+        const session = supabase.auth.getSession();
+
+        if (session) {
+          setUserId((await session).data.session.user.id)
+        }
+      };
+
+      checkSession();
+
+  },[getMaxUsersForEvent]);
+
+  useEffect(() => {
+    const fetchAvgRating = async () => {
+        if (userId) {
+            const { data: ratingsData, error: ratingsError } = await supabase
+                .from('user_ratings') // Replace 'ratings' with your actual table name
+                .select('rating')
+                .eq('ratee_id', userId);
+    
+            if (ratingsError) {
+                console.error('Error fetching ratings:', ratingsError);
+            } else if (ratingsData.length > 0) {
+                const total = ratingsData.reduce((acc, { rating }) => acc + rating, 0);
+                const avgRating = total / ratingsData.length;
+                setAverageRating(avgRating);
+            } else {
+                setAverageRating(0); // Set to 0 if no ratings found
+            }
+        }
+    };
+
+    console.log(averageRating);
+
+    fetchAvgRating();
+  }, [userId]);
+
+  
+
+  function formatDateTime(dateTimeStr) {
+      const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      };
+    
+      return new Date(dateTimeStr).toLocaleString('en-US', options);
+  }
+
+  async function attendEvent(eventId) {
+      const id = (await supabase.auth.getUser()).data.user.id;
+      // Step 1: Retrieve the current attendees array for the event
+      const { data: eventData, error: retrieveError } = await supabase
           .from('events')
-          .select('*')
+          .select('event_attendees')
           .eq('id', eventId)
           .single();
 
-      if (error) {
-          throw error;
+      if (retrieveError) {
+          console.error('Error retrieving event data:', retrieveError);
+          return false;
       }
 
-      return data;
-  } catch (err) {
-      console.error('Error fetching event:', err);
-      throw err;
-  }
-}
-
-async function getSportById(sportId) {
-  try {
-      const { data, error } = await supabase
-          .from('sports')
-          .select('*')
-          .eq('id', sportId)
-          .single();
-
-      if (error) {
-          throw error;
+      // Check if the user is already attending the event
+      if (eventData.event_attendees && eventData.event_attendees.includes(id)) {
+          console.log('User is already attending the event');
+          return false;
       }
 
-      return data;
-  } catch (err) {
-      console.error('Error fetching sport:', err);
-      throw err;
+      // Step 2: Append the new username to the attendees array
+      const updatedAttendees = eventData.event_attendees ? [...eventData.event_attendees, id] : [id];
+
+      // Step 3: Update the event with the new attendees array
+      const { error: updateError } = await supabase
+          .from('events')
+          .update({ event_attendees: updatedAttendees })
+          .eq('id', eventId);
+
+      if (updateError) {
+          console.error('Error updating event attendees:', updateError);
+          return false;
+      }
+
+      console.log('Attendee added successfully');
+      if (!updateError) {
+        console.log('Attendee removed successfully');
+        
+        // Update the events state
+        setEvents(prevEvents => prevEvents.map(event => {
+          if (event.id === eventId) {
+            return {
+              ...event,
+              event_attendees: updatedAttendees
+            };
+          }
+          return event;
+        }));
+      }
+    
+      return !updateError;
   }
-}
 
+  async function getEventById(eventId) {
+    try {
+        const { data, error } = await supabase
+            .from('events')
+            .select('*')
+            .eq('id', eventId)
+            .single();
 
-async function addAttendeeToEvent(eventId) {
-  const event = await getEventById(eventId);
-  const sport = await getSportById(event.sport_id);
-  const currentAttendees = event.event_attendees.length;
+        if (error) {
+            throw error;
+        }
 
-  if (currentAttendees.length >= sport.playerNum) {
-      throw new Error("Attendee limit reached for this event.");
+        return data;
+    } catch (err) {
+        console.error('Error fetching event:', err);
+        throw err;
+    }
   }
 
-  attendEvent(event.id);
-}
+  async function getSportById(sportId) {
+    try {
+        const { data, error } = await supabase
+            .from('sports')
+            .select('*')
+            .eq('id', sportId)
+            .single();
+
+        if (error) {
+            throw error;
+        }
+
+        return data;
+    } catch (err) {
+        console.error('Error fetching sport:', err);
+        throw err;
+    }
+  }
+
+
+  async function addAttendeeToEvent(eventId) {
+    const event = await getEventById(eventId);
+    const sport = await getSportById(event.sport_id);
+    const currentAttendees = event.event_attendees.length;
+
+    if (currentAttendees.length >= sport.playerNum) {
+        throw new Error("Attendee limit reached for this event.");
+    }
+
+    attendEvent(event.id);
+  }
 
 async function unattendEvent(eventId) {
   // Retrieve the current attendees array for the event
@@ -228,7 +271,9 @@ async function unattendEvent(eventId) {
             <p>Date and Time: {formatDateTime(event.date)}</p>
             <p>Address: {event.address}</p>
            
-            <div><p className="event-details">Created by: {event.creator}</p><p>Number of Attendees: {event.event_attendees.length}/{event.maxUsers}</p></div>
+            <div><p className="event-details">Created by: {event.creator}  Creator's Average Rating: {event.creatorAvgRating?.toFixed(1) || 'Not Available'}</p>
+            
+            <p>Number of Attendees: {event.event_attendees.length}/{event.maxUsers}</p></div>
             {event.event_attendees.includes(userId) ? (
                 <button className="attbutton" onClick={() => unattendEvent(event.id)}>Unattend Event</button>
               ) : (

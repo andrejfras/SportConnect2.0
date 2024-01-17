@@ -46,10 +46,14 @@ function Profile() {
     e.preventDefault();
     setLoading(true);
 
+    console.log(name);
+
+    const userResponse = await supabase.auth.getUser();
     const { error } = await supabase
-      .from('profiles')
-      .update({ username, name, surname, age: birthdate}) // Include age in the update
-      .eq('user_id', (await supabase.auth.getUser()).data.user.id);
+    .from('profiles')
+    .update({ username, age: birthdate, name, surname })
+    .eq('user_id', userResponse.data.user.id);
+
 
     if (error) {
       setMessage(error.message);
@@ -90,6 +94,7 @@ function Profile() {
           <label>Name:</label>
           <input
             type="text"
+            id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
