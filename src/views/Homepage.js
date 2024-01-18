@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import supabase from '../services/supabaseClient';
 import './css/Homepage.css';
 import MiniMapComponent from './MiniMapComponent';
+import { Link } from 'react-router-dom';
 
 function Homepage() {
   const [events, setEvents] = useState([]);
@@ -40,7 +41,7 @@ function Homepage() {
           const { data: ratingsData } = await supabase
               .from('user_ratings')
               .select('rating')
-              .eq('ratee_id', event.creator); // Assuming 'creator' holds the user ID of the creator
+              .eq('ratee_id', fetchProfileByUsername(event.creator)); // Assuming 'creator' holds the user ID of the creator
 
           let avgRating = 0;
           if (ratingsData && ratingsData.length > 0) {
@@ -51,8 +52,13 @@ function Homepage() {
           return { ...event, creatorAvgRating: avgRating };
       }));
 
-      setEvents(updatedEventsWithRatings);
-  };
+      const updatedEventsWithProfiles = await Promise.all(updatedEventsWithRatings.map(async (event) => {
+        const userId = await fetchProfileByUsername(event.creator);
+        return { ...event, creatorId: userId };
+      }));
+
+      setEvents(updatedEventsWithProfiles);
+      };
 
       fetchSportsAndEvents();
 
@@ -66,10 +72,11 @@ function Homepage() {
 
       checkSession();
 
+
   },[getMaxUsersForEvent]);
 
   useEffect(() => {
-    const fetchAvgRating = async () => {
+    const fetchAvgRating  = async () => {
         if (userId) {
             const { data: ratingsData, error: ratingsError } = await supabase
                 .from('user_ratings') // Replace 'ratings' with your actual table name
@@ -91,7 +98,7 @@ function Homepage() {
     console.log(averageRating);
 
     fetchAvgRating();
-  }, [userId]);
+  }, [userId, averageRating]);
 
   
 
@@ -211,6 +218,28 @@ function Homepage() {
     attendEvent(event.id);
   }
 
+  async function fetchProfileByUsername(username) {
+    try {
+        const { data, error } = await supabase
+            .from('profiles') // Assuming 'profiles' is your table name
+            .select('*')
+            .eq('username', username) // 'username' is the column in your table
+            .single(); // Use 'single' if you expect only one record
+
+        if (error) {
+            throw error;
+        }
+
+        console.log(data.user_id);
+
+        return data.user_id;
+    } catch (err) {
+        console.error('Error fetching profile:', err);
+        // Handle the error appropriately
+        return null;
+    }
+}
+
 async function unattendEvent(eventId) {
   // Retrieve the current attendees array for the event
   const { data: eventData, error: retrieveError } = await supabase
@@ -271,7 +300,12 @@ async function unattendEvent(eventId) {
             <p>Date and Time: {formatDateTime(event.date)}</p>
             <p>Address: {event.address}</p>
            
-            <div><p className="event-details">Created by: {event.creator}  Creator's Average Rating: {event.creatorAvgRating?.toFixed(1) || 'Not Available'}</p>
+            <div>
+            <p className="event-details">
+              Created by: 
+              <Link to={`/profile/${event.creatorId}`}>
+                {event.creator}
+              </Link></p>
             
             <p>Number of Attendees: {event.event_attendees.length}/{event.maxUsers}</p></div>
             {event.event_attendees.includes(userId) ? (

@@ -13,8 +13,8 @@ function Rating({ onRate, rateeId }) {
 
   return (
     <div>
-      <h3>Rate this user</h3>
       <div>
+      <h3>Rate this user:</h3>
         {[1, 2, 3, 4, 5].map((value) => (
           <button
             key={value}

@@ -17,6 +17,7 @@ function UserProfile() {
     const [existingRating, setExistingRating] = useState(null);
     const [hasRated, setHasRated] = useState(false);
     const [averageRating, setAverageRating] = useState(0);
+    const [reviews, setReviews] = useState([]);
 
 
     useEffect(() => {
@@ -123,6 +124,25 @@ function UserProfile() {
         console.log(averageRating);
     
         fetchAvgRating();
+
+        const fetchReviews = async () => {
+            if (userId) {
+                const { data: reviewsData, error: reviewsError } = await supabase
+                    .from('user_ratings')
+                    .select('*')
+                    .eq('ratee_id', userId);
+
+                if (reviewsError) {
+                    console.error('Error fetching reviews:', reviewsError);
+                } else {
+                    setReviews(reviewsData);
+                }
+            }
+        };
+
+        fetchReviews();
+
+
     }, [userId]);
 
 
@@ -195,19 +215,20 @@ function UserProfile() {
     };
 
     return (
-        <div>
-            <h1>User Profile</h1>
-            <p>Username: {username}</p>
-            <p>Id: {userId}</p>
-            <p>Name: {name}</p>
-            <p>Average Rating: {averageRating.toFixed(1)}</p> {/* Formatting to one decimal place */}
-            <textarea
-                value={review}
-                onChange={(e) => setReview(e.target.value)}
-                placeholder="Write a review"
-            />
+        <div className="user-profile">
+        <h1>User Profile</h1>
+        <p>Username: {username}</p>
+        <p>Id: {userId}</p>
+        <p>Name: {name}, {surname}</p>
+        <p>Average Rating: {averageRating.toFixed(1)}</p>
+        <textarea
+            value={review}
+            onChange={(e) => setReview(e.target.value)}
+            placeholder="Write a review"
+        />
+        <div className="rating-display">
             {hasRated ? (
-                <div>
+                <div className="button-group">
                     <Rating onRate={(rateeId, rating) => handleRateUser(rateeId, rating)} rateeId={userId} />
                     <button onClick={handleDeleteRating}>Delete Rating</button>
                 </div>
@@ -215,6 +236,20 @@ function UserProfile() {
                 <Rating onRate={handleRateUser} rateeId={userId} />
             )}
         </div>
+        <div className="review-section">
+            <h2>User Reviews</h2>
+            {reviews.length > 0 ? (
+                reviews.map(review => (
+                    <div key={review.id} className="review-item">
+                        <p>Rating: {review.rating}</p>
+                        <p>Review: {review.review}</p>
+                    </div>
+                ))
+            ) : (
+                <p>No reviews available.</p>
+            )}
+        </div>
+    </div>
     );
 }
 
