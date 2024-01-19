@@ -10,6 +10,7 @@ function Homepage() {
   const [userId, setUserId] = useState('');
   const [averageRating, setAverageRating] = useState(0);
   const [comments, setComments] = useState({}); // Object with event IDs as keys and arrays of comments as values
+  const [userProfiles, setUserProfiles] = useState({});
 
   const getMaxUsersForEvent = useCallback(async (eventId) => {
     const event = await getEventById(eventId);
@@ -106,15 +107,60 @@ function Homepage() {
 
   // Function to fetch comments for an event
   const fetchComments = async (eventId) => {
-    // API call to fetch comments
-    const response = await supabase.from('comments').select('*').eq('event_id', eventId);
-    setComments(prevComments => ({ ...prevComments, [eventId]: response.data }));
+    try {
+      const { data: commentsData, error } = await supabase.from('comments').select('*').eq('event_id', eventId);
+      if (error) {
+        console.error('Error fetching comments:', error);
+        return;
+      }
+  
+      // Fetch user profiles for each comment
+      const profiles = await Promise.all(commentsData.map(async comment => {
+        return await fetchProfileById(comment.user_id);
+      }));
+  
+      // Update comments and user profiles state
+      setComments(prevComments => ({ ...prevComments, [eventId]: commentsData }));
+      setUserProfiles(prevProfiles => ({ ...prevProfiles, ...profiles }));
+    } catch (err) {
+      console.error('Error in fetchComments:', err);
+    }
   };
 
   // Call fetchComments when the component mounts or when events change
   useEffect(() => {
     events.forEach(event => fetchComments(event.id));
   }, [events]);
+
+  const submitComment = async (userId, eventId, commentText) => {
+
+    // Construct a new comment object
+    const newComment = {
+      event_id: eventId,
+      user_id: userId,
+      username: await fetchProfileById(userId), // You need to pass the userId as an argument or get it from your auth state
+      comment: commentText, // Optional: Handle timestamp in your backend or DB
+    };
+  
+    // API call to submit comment to Supabase
+    const { data, error } = await supabase
+      .from('comments') // Assuming 'comments' is your table name
+      .insert([newComment]);
+  
+    if (error) {
+      console.error('Error submitting comment:', error);
+      return; // Handle the error appropriately
+    }
+  
+    // Assuming the data returned includes the new comment with an id
+    const submittedComment = newComment;
+  
+    // Update comments state to immediately show the new comment
+    setComments(prevComments => ({
+      ...prevComments,
+      [eventId]: [...(prevComments[eventId] || []), submittedComment]
+    }));
+  };
 
   function formatDateTime(dateTimeStr) {
       const options = { 
@@ -255,6 +301,28 @@ function Homepage() {
     }
 }
 
+async function fetchProfileById(id) {
+  try {
+      const { data, error } = await supabase
+          .from('profiles') // Assuming 'profiles' is your table name
+          .select('*')
+          .eq('user_id', id) // 'username' is the column in your table
+          .single(); // Use 'single' if you expect only one record
+
+      if (error) {
+          throw error;
+      }
+
+      console.log(data.user_id);
+
+      return data.username;
+  } catch (err) {
+      console.error('Error fetching profile:', err);
+      // Handle the error appropriately
+      return null;
+  }
+}
+
 async function unattendEvent(eventId) {
   // Retrieve the current attendees array for the event
   const { data: eventData, error: retrieveError } = await supabase
@@ -308,6 +376,7 @@ async function unattendEvent(eventId) {
   return (
     <div>
       {events.map(event => (
+        <div>
         <div key={event.id} className="event-box">
           <div className = "event-info">
             <h2 className="event-title">{event.title}</h2>
@@ -338,8 +407,32 @@ async function unattendEvent(eventId) {
               </div>
             )}
           </div>
+        
           {/* More event details */}
-        </div>
+          
+      </div>
+      <div className="comments-section">
+            <h3>Comments</h3>
+            {comments[event.id] && comments[event.id].length > 0 ? (
+              comments[event.id].map(comment => (
+                <div key={comment.id} className="comment">
+                   <p>{comment.username} : {comment.comment}</p>
+                  {/* other comment details */}
+                </div>
+              ))
+            ) : (
+              <p>No comments yet.</p>
+            )}
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              submitComment(userId, event.id, e.target.commentText.value); // Ensure you pass the userId
+              e.target.reset(); // Reset form after submit
+            }}>
+              <input type="text" name="commentText" placeholder="Add a comment" required />
+              <button type="submit">Post Comment</button>
+            </form>
+          </div>
+      </div>
       ))}
     </div>
   );

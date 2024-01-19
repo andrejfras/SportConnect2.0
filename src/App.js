@@ -37,6 +37,7 @@ function Navbar({ username, onLogout, onSearch }) {
     navigate(`/profile/${userId}`); // Navigate to user's profile
   };
 
+
   return (
     <nav className="navbar">
       <ul style={{ listStyleType: 'none', display: 'flex', justifyContent: 'space-around' }}>
@@ -84,9 +85,13 @@ function Navbar({ username, onLogout, onSearch }) {
 
 
 
+
+
+
 function App() {
   const [username, setUsername] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
+
 
   const handleSearch = async (query) => {
     const results = await searchUsers(query); // Make sure searchUsers always returns an array
@@ -174,7 +179,6 @@ function App() {
     await supabase.auth.signOut();
     setUsername(null);
   };
-
 
 
   return (

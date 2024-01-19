@@ -105,7 +105,7 @@ function UserProfile() {
         const fetchAvgRating = async () => {
             if (userId) {
                 const { data: ratingsData, error: ratingsError } = await supabase
-                    .from('user_ratings') // Replace 'ratings' with your actual table name
+                    .from('user_ratings') 
                     .select('rating')
                     .eq('ratee_id', userId);
         
@@ -124,6 +124,8 @@ function UserProfile() {
         console.log(averageRating);
     
         fetchAvgRating();
+
+        
 
         const fetchReviews = async () => {
             if (userId) {
@@ -144,6 +146,8 @@ function UserProfile() {
 
 
     }, [userId]);
+
+    
 
 
     const handleDeleteRating = async () => {
