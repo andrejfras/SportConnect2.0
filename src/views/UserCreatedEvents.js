@@ -6,7 +6,7 @@ function UserCreatedEvents() {
   const [loading, setLoading] = useState('');
   const [sports, setSports] = useState({});
   const [userId, setUser] = useState('');
-
+  const [editingEvent, setEditingEvent] = useState(null);
 
 
   useEffect(() => {
@@ -103,10 +103,49 @@ const deleteEvent = async (eventId) => {
     }
   };
 
+const handleEditEventSubmit = async (e, eventId) => {
+  e.preventDefault();
+
+  const updatedEvent = {
+      title: e.target.title.value,
+      description: e.target.description.value,
+      // other fields like description, date, etc.
+  };
+
+  try {
+      const { error } = await supabase
+          .from('events')
+          .update(updatedEvent)
+          .eq('id', eventId);
+
+      if (error) {
+          throw error;
+      }
+
+      // Update the event in the userEvents state
+      setUserEvents(userEvents.map(event => 
+          event.id === eventId ? { ...event, ...updatedEvent } : event
+      ));
+
+      setEditingEvent(null);
+  } catch (err) {
+      console.error('Error updating event:', err);
+  }
+};
+
   return (
     <div>
        
       <h2>Events Created by Me</h2>
+      {editingEvent && (
+            <form onSubmit={(e) => handleEditEventSubmit(e, editingEvent.id)}>
+                <input type="text" defaultValue={editingEvent.title} name="title" />
+                <input type="text" defaultValue={editingEvent.description} name="description" />
+          
+                <button type="submit">Save Changes</button>
+                <button onClick={() => setEditingEvent(null)}>Cancel</button>
+            </form>
+      )}
       {userEvents.length > 0 ? (
         userEvents.map(event => (
         <div key={event.id} className="event-box">
@@ -120,10 +159,12 @@ const deleteEvent = async (eventId) => {
             <p className="event-details">Created by: {event.creator}</p>
             <p>Number of Attendees: {event.event_attendees.length}/{event.maxUsers}</p>
             </div>
+            <button onClick={() => setEditingEvent(event)}>Edit Event</button>
             <button onClick={() => deleteEvent(event.id)}>Delete Event</button>
           </div>
         </div>
         ))
+        
       ) : (
         <p>No events created yet. {userId}</p>
      

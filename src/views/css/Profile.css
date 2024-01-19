@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Salsa&display=swap');
+
+.manage-profile {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: "Exo 2", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.manage-profile h1 {
+    text-align: center;
+    color: #333;
+}
+
+.manage-profile form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-family: "Exo 2", sans-serif;
+}
+
+.manage-profile label {
+    font-weight: bold;
+    color: #555;
+}
+
+.manage-profile input[type="text"],
+.manage-profile input[type="date"] {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: "Exo 2", sans-serif;
+}
+
+.manage-profile button {
+    background-color: #c9c9c9;
+    color: rgb(0, 0, 0);
+    padding: 15px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 50px;
+    font-family: "Exo 2", sans-serif;
+}
+
+.manage-profile button:hover {
+    background-color: #0056b3;
+}
+
+.manage-profile p {
+    text-align: center;
+    color: green;
+}

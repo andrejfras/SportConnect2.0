@@ -11,6 +11,9 @@ function Homepage() {
   const [averageRating, setAverageRating] = useState(0);
   const [comments, setComments] = useState({}); // Object with event IDs as keys and arrays of comments as values
   const [userProfiles, setUserProfiles] = useState({});
+  const [showAttendees, setShowAttendees] = useState(false);
+  const [currentEventAttendees, setCurrentEventAttendees] = useState([]);
+
 
   const getMaxUsersForEvent = useCallback(async (eventId) => {
     const event = await getEventById(eventId);
@@ -23,12 +26,14 @@ function Homepage() {
 
       const checkSession = async () => {
         const session = supabase.auth.getSession();
-
-        if (session) {
-           setUserId((await session).data.session.user.id)
+        
+        if((await session).data.session == null){
+          setUserId("no user")
         }
+        else if (session) {
+          setUserId((await session).data.session.user.id);
+        } 
       };
-
       const fetchSportsAndEvents = async () => {
         const { data: sportsData } = await supabase.from('sports').select('*');
         const sportsMap = {};
@@ -371,67 +376,95 @@ async function unattendEvent(eventId) {
   return !updateError;
 }
 
+const handleShowAttendees = async (eventId) => {
+  const selectedEvent = events.find(event => event.id === eventId);
+  if (selectedEvent) {
+    try {
+      const attendeeUsernames = await Promise.all(
+        selectedEvent.event_attendees.map(async (userId) => {
+          const username = await fetchProfileById(userId);
+          return username;
+        })
+      );
+      setCurrentEventAttendees(attendeeUsernames);
+      setShowAttendees(true);
+    } catch (error) {
+      console.error('Error fetching attendee usernames:', error);
+      // Handle error (e.g., show a notification to the user)
+    }
+  }
+};
+
+
 
 
   return (
     <div>
       {events.map(event => (
         <div>
-        <div key={event.id} className="event-box">
-          <div className = "event-info">
-            <h2 className="event-title">{event.title}</h2>
-            <h4>Sport: {sports[event.sport_id]}</h4>
-            <p className="event-description">{event.description}</p>
-            <p>Date and Time: {formatDateTime(event.date)}</p>
-            <p>Address: {event.address}</p>
-           
-            <div>
-            <p className="event-details">
-              Created by: 
-              <Link to={`/profile/${event.creatorId}`}>
-                {event.creator}
-              </Link></p>
+          <div key={event.id} className="event-box">
+            <div className = "event-info">
+              <h2 className="event-title">{event.title}</h2>
+              <h4>Sport: {sports[event.sport_id]}</h4>
+              <p className="event-description">{event.description}</p>
+              <p>Date and Time: {formatDateTime(event.date)}</p>
+              <p>Address: {event.address}</p>
             
-            <p>Number of Attendees: {event.event_attendees.length}/{event.maxUsers}</p></div>
-            {event.event_attendees.includes(userId) ? (
-                <button className="attbutton" onClick={() => unattendEvent(event.id)}>Unattend Event</button>
-              ) : (
-                <button className="attbutton" onClick={() => addAttendeeToEvent(event.id)}>Attend Event</button>
-            )}
-          </div>
-          <div className="map">
-            {event.location && (
               <div>
-                
-                <MiniMapComponent coordinates={event.location} />
+              <p className="event-details">
+                Created by: 
+                <Link to={`/profile/${event.creatorId}`}>
+                  {event.creator}
+                </Link></p>
+              
+                <p>Number of Attendees: {event.event_attendees.length}/{event.maxUsers} <button onClick={() => handleShowAttendees(event.id)}>Display Attendees</button></p>
+                {showAttendees && (
+                    <div className="attendee-list">
+                      <h3>Attendees</h3>
+                      {currentEventAttendees.map((attendee, index) => (
+                        <p key={index}>{attendee}</p> // Adjust based on how attendee data is structured
+                      ))}
+                      <button onClick={() => { setShowAttendees(false)}}>Close</button>
+                    </div>
+                  )}
               </div>
-            )}
-          </div>
-        
-          {/* More event details */}
-          
-      </div>
-      <div className="comments-section">
-            <h3>Comments</h3>
-            {comments[event.id] && comments[event.id].length > 0 ? (
-              comments[event.id].map(comment => (
-                <div key={comment.id} className="comment">
-                   <p>{comment.username} : {comment.comment}</p>
-                  {/* other comment details */}
+              {event.event_attendees.includes(userId) ? (
+                  <button className="attbutton" onClick={() => unattendEvent(event.id)}>Unattend Event</button>
+                ) : (
+                  <button className="attbutton" onClick={() => addAttendeeToEvent(event.id)}>Attend Event</button>
+              )}
+            </div>
+            <div className="map">
+              {event.location && (
+                <div>
+                  
+                  <MiniMapComponent coordinates={event.location} />
                 </div>
-              ))
-            ) : (
-              <p>No comments yet.</p>
-            )}
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              submitComment(userId, event.id, e.target.commentText.value); // Ensure you pass the userId
-              e.target.reset(); // Reset form after submit
-            }}>
-              <input type="text" name="commentText" placeholder="Add a comment" required />
-              <button type="submit">Post Comment</button>
-            </form>
+              )}
+            </div>
+          
           </div>
+          <div className="comments-section">
+              <h3>Comments</h3>
+              {comments[event.id] && comments[event.id].length > 0 ? (
+                comments[event.id].map(comment => (
+                  <div key={comment.id} className="comment">
+                    <p>{comment.username} : {comment.comment}</p>
+                    {/* other comment details */}
+                  </div>
+                ))
+              ) : (
+                <p>No comments yet.</p>
+              )}
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                submitComment(userId, event.id, e.target.commentText.value); // Ensure you pass the userId
+                e.target.reset(); // Reset form after submit
+              }}>
+                <input type="text" name="commentText" placeholder="Add a comment" required />
+                <button type="submit">Post Comment</button>
+              </form>
+        </div>
       </div>
       ))}
     </div>

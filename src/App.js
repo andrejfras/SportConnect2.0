@@ -16,6 +16,8 @@ function Navbar({ username, onLogout, onSearch }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [user, setUser] = useState('');
+
 
   const handleSearchChange = async (e) => {
     const query = e.target.value;

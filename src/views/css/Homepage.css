@@ -9,7 +9,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px; /* Adjust as needed */
+    margin-bottom: 0px; /* Adjust as needed */
     text-align: left;
 
    
@@ -55,4 +55,23 @@
     font-style: normal;
 }
   
+
+.comments-section{
+  border: 1px solid #ddd; /* Light grey border */
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
+
+  margin-bottom: 20px; /* Adjust as needed */
+  text-align: left;
+}
+
+.attendee-list {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  /* other styling as needed */
+}
 

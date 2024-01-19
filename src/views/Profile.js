@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import supabase from '../services/supabaseClient';
+import "./css/Profile.css";
 
 function Profile() {
   const [loading, setLoading] = useState(true);
@@ -69,10 +70,9 @@ function Profile() {
   }
 
   return (
-    <div>
+    <div className="manage-profile">
       <h1>Manage Profile</h1>
       <form onSubmit={handleUpdateProfile}>
-        {/* Existing form fields */}
         <div>
           <label>Username:</label>
           <input
@@ -83,18 +83,17 @@ function Profile() {
         </div>
         <div>
           <label htmlFor="birthdate">Date of Birth:</label>
-            <input
-              type="date"
-              id="birthdate"
-              value={birthdate}
-              onChange={(e) => setBirthdate(e.target.value)}
+          <input
+            type="date"
+            id="birthdate"
+            value={birthdate}
+            onChange={(e) => setBirthdate(e.target.value)}
           />
         </div>
         <div>
           <label>Name:</label>
           <input
             type="text"
-            id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
