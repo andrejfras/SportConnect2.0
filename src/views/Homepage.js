@@ -9,6 +9,7 @@ function Homepage() {
   const [sports, setSports] = useState({});
   const [userId, setUserId] = useState('');
   const [averageRating, setAverageRating] = useState(0);
+  const [comments, setComments] = useState({}); // Object with event IDs as keys and arrays of comments as values
 
   const getMaxUsersForEvent = useCallback(async (eventId) => {
     const event = await getEventById(eventId);
@@ -16,7 +17,17 @@ function Homepage() {
     return sport.playerNum;
   }, []);
 
+  
   useEffect(() => {
+
+      const checkSession = async () => {
+        const session = supabase.auth.getSession();
+
+        if (session) {
+           setUserId((await session).data.session.user.id)
+        }
+      };
+
       const fetchSportsAndEvents = async () => {
         const { data: sportsData } = await supabase.from('sports').select('*');
         const sportsMap = {};
@@ -62,14 +73,6 @@ function Homepage() {
 
       fetchSportsAndEvents();
 
-      const checkSession = async () => {
-        const session = supabase.auth.getSession();
-
-        if (session) {
-          setUserId((await session).data.session.user.id)
-        }
-      };
-
       checkSession();
 
 
@@ -100,7 +103,18 @@ function Homepage() {
     fetchAvgRating();
   }, [userId, averageRating]);
 
-  
+
+  // Function to fetch comments for an event
+  const fetchComments = async (eventId) => {
+    // API call to fetch comments
+    const response = await supabase.from('comments').select('*').eq('event_id', eventId);
+    setComments(prevComments => ({ ...prevComments, [eventId]: response.data }));
+  };
+
+  // Call fetchComments when the component mounts or when events change
+  useEffect(() => {
+    events.forEach(event => fetchComments(event.id));
+  }, [events]);
 
   function formatDateTime(dateTimeStr) {
       const options = { 
@@ -149,6 +163,7 @@ function Homepage() {
       }
 
       console.log('Attendee added successfully');
+      alert('You have successfully attended the event!');
       if (!updateError) {
         console.log('Attendee removed successfully');
         
@@ -271,6 +286,7 @@ async function unattendEvent(eventId) {
 
   if (!updateError) {
     console.log('Attendee removed successfully');
+    alert('You are no longer attending the event');
     
     // Update the events state
     setEvents(prevEvents => prevEvents.map(event => {

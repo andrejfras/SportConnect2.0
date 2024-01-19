@@ -19,7 +19,9 @@ function Login() {
       if (error) throw error;
 
       console.log('User logged in:', user);
-      navigate('/home');
+      
+      navigate('/');
+      window.location.reload();
     } catch (err) {
       setError(err.message);
       console.error('Login error:', err);

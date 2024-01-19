@@ -1,0 +1,20 @@
+runtime: nodejs
+env: flex
+
+handlers:
+  - url: /(.*\.(json|ico|js|css))$
+    static_files: build/\1
+    upload: build/(.*\.(json|ico|js|css))$
+
+  - url: /.*
+    static_files: build/index.html
+    upload: build/index.html
+
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 5
+
+resources:
+  cpu: 1
+  memory_gb: 1
+  disk_size_gb: 10

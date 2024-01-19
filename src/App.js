@@ -30,6 +30,7 @@ function Navbar({ username, onLogout, onSearch }) {
     }
   };
 
+
   const navigate = useNavigate();
 
   const handleUserClick = (userId) => {
