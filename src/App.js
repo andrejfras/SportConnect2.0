@@ -127,7 +127,7 @@ function App() {
       if (session) {
         // Assuming the user's email is used as the username
         // Replace 'email' with the appropriate field if different
-     //   setUsername(session.data.user.email);
+        setUsername(username);
       }
     };
 

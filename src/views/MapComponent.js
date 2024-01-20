@@ -45,7 +45,6 @@ const MapComponent = ({ onLocationChange }) => {
         }
       },
     });
-
     
 
     return position === null ? null : (

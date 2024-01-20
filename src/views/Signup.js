@@ -36,7 +36,8 @@ function Signup() {
       if (user) {
         console.log('User signed up:', user.user.id);
         await createUserProfile(user);
-        navigate('/login');
+        navigate('/');
+        window.location.reload();
       } else {
         setError('Failed to sign up.');
       }

@@ -56,7 +56,7 @@ function UserCreatedEvents() {
         const { data, error } = await supabase
           .from('events')
           .select('*')
-          .eq('creator', userId); // assuming the column for creator/user is 'creator'
+          .eq('creator', userId); 
           
         if (error) {
           throw error;
