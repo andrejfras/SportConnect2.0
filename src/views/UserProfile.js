@@ -167,6 +167,8 @@ function UserProfile() {
         } catch (error) {
             console.error('Error deleting rating:', error);
         }
+        
+        window.location.reload();
     };
 
     const submitRating = async (newRating, newReview) => {
@@ -211,6 +213,7 @@ function UserProfile() {
         } catch (error) {
             console.error('Error in submitRating:', error);
         }
+        window.location.reload();
     };
     
     

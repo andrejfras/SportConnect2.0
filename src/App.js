@@ -122,7 +122,7 @@ function App() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const session = supabase.auth.getSession();
+      const session = await supabase.auth.getSession();
 
       if (session) {
         // Assuming the user's email is used as the username
@@ -174,7 +174,7 @@ function App() {
         authListener.subscription.unsubscribe();
       }
     };
-  }, []);
+  }, [username]);
 
   const handleLogout = async () => {
     // Logic for handling logout

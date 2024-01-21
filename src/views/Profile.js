@@ -62,6 +62,7 @@ function Profile() {
       setMessage('Profile updated successfully!');
     }
 
+    window.location.reload();
     setLoading(false);
   };
 
